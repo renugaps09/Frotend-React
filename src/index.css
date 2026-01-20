@@ -1,1 +1,59 @@
 @import "tailwindcss";
+.leaflet-container {
+  z-index: 1 !important;
+}
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-25px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.delay-2000 {
+  animation-delay: 2s;
+}
+
+.delay-4000 {
+  animation-delay: 4s;
+}
+
+.delay-6000 {
+  animation-delay: 6s;
+}
+
+
+
+
+
+@keyframes wave {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.1) translateY(-20px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.animate-wave {
+  animation: wave 10s ease-in-out infinite;
+}
+
+@keyframes tagFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0); }
+}
+
+.animate-tag {
+  animation: tagFloat 6s ease-in-out infinite;
+}
+
+.delay-3000 { animation-delay: 3s; }
+.delay-4000 { animation-delay: 4s; }
+.delay-6000 { animation-delay: 6s; }
