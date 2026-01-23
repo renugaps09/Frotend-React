@@ -13,7 +13,7 @@ export const signupUser = async (data) => {
       throw new Error(err.message || "Signup failed");
     }
 
-    return await res.json();
+    return await res.json(); n    
   } catch (err) {
     throw err;
   }

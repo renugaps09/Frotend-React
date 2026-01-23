@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import PasswordInput from "../components/PasswordInput";
 import { signupUser } from "../api/auth";
 
-export default function Signup() {
+export default function Signup({ setIsAuth }) {
+  // Store form data
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -10,16 +13,31 @@ export default function Signup() {
     confirmPassword: "",
   });
 
+  // Used to redirect user after signup
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check password match
     if (form.password !== form.confirmPassword) {
       return alert("Passwords do not match");
     }
 
     try {
+      // Call backend signup API
       const res = await signupUser(form);
-      alert(res.message);
+
+      // Save token in localStorage
+      localStorage.setItem("token", res.accessToken);
+
+      // ⭐ Tell Router user is logged in
+      setIsAuth(true);
+
+      alert("Signup successful");
+
+      // Redirect to Home page
+      navigate("/", { replace: true });
     } catch (err) {
       alert(err.message);
     }
@@ -36,21 +54,27 @@ export default function Signup() {
         <input
           className="w-full p-2 border rounded mb-3"
           placeholder="Name"
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
           required
+          onChange={(e) =>
+            setForm({ ...form, name: e.target.value })
+          }
         />
 
         <input
           className="w-full p-2 border rounded mb-3"
           placeholder="Email"
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
+          onChange={(e) =>
+            setForm({ ...form, email: e.target.value })
+          }
         />
 
         <div className="mb-3">
           <PasswordInput
             placeholder="Password"
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            onChange={(e) =>
+              setForm({ ...form, password: e.target.value })
+            }
           />
         </div>
 
@@ -58,17 +82,20 @@ export default function Signup() {
           <PasswordInput
             placeholder="Confirm Password"
             onChange={(e) =>
-              setForm({ ...form, confirmPassword: e.target.value })
+              setForm({
+                ...form,
+                confirmPassword: e.target.value,
+              })
             }
           />
         </div>
 
-        <button className="w-full bg-black text-white p-2 rounded">
+        <button className="w-full bg-blue-600 text-white p-2 rounded">
           Signup
         </button>
 
         <p className="text-sm mt-3">
-          Already have account?{" "}
+          Already have an account?{" "}
           <a className="text-blue-500" href="/login">
             Login
           </a>
