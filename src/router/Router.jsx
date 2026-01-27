@@ -9,41 +9,32 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import PasswordInput from "../components/PasswordInput";
 import ProtectedRoute from "../components/ProtectedRoute";
+import StudentList from "../components/StudentList";
+import StudentForm from "../components/StudentForm";
 
 function Router() {
-  // ✅ React STATE (not normal variable)
-  // Reads token once when app loads
   const [isAuth, setIsAuth] = useState(
     Boolean(localStorage.getItem("token"))
   );
 
   return (
     <BrowserRouter>
-      {/* ✅ Show Navbar ONLY when logged in */}
+      {/* Show Navbar ONLY when logged in */}
       {isAuth && <Navbar setIsAuth={setIsAuth} />}
 
-
       <Routes>
-        {/* ✅ Home page is protected */}
+        {/* Home page */}
         <Route
           path="/"
-          element={
-            isAuth ? <Home /> : <Navigate to="/login" replace />
-          }
+          element={isAuth ? <Home /> : <Navigate to="/login" replace />}
         />
 
-        {/* 🔓 Public routes */}
-        <Route
-          path="/login"
-          element={<Login setIsAuth={setIsAuth} />}
-        />
-        <Route
-          path="/signup"
-          element={<Signup setIsAuth={setIsAuth} />}
-        />
+        {/* Public routes */}
+        <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
+        <Route path="/signup" element={<Signup setIsAuth={setIsAuth} />} />
         <Route path="/password" element={<PasswordInput />} />
 
-        {/* 🔒 Protected routes */}
+        {/* Protected routes */}
         <Route
           path="/products"
           element={
@@ -57,6 +48,32 @@ function Router() {
           element={
             <ProtectedRoute isAuth={isAuth}>
               <DeliveryForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Students routes */}
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute isAuth={isAuth}>
+              <StudentList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/add"
+          element={
+            <ProtectedRoute isAuth={isAuth}>
+              <StudentForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/edit/:id"
+          element={
+            <ProtectedRoute isAuth={isAuth}>
+              <StudentForm />
             </ProtectedRoute>
           }
         />
