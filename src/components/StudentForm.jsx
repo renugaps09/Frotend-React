@@ -6,9 +6,11 @@ import {
   updateStudent,
 } from "../api/studentApi";
 
+const subjectsList = ["Math", "Physics", "Chemistry", "Biology", "English", "Computer Science"];
+
 const StudentForm = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // if editing, we get the student ID
+  const { id } = useParams();
 
   const [student, setStudent] = useState({
     firstName: "",
@@ -20,12 +22,12 @@ const StudentForm = () => {
     dob: "",
     year: "",
     address: "",
+    interestedSubjects: [],
   });
-  const [photo, setPhoto] = useState(null); // file
-  const [preview, setPreview] = useState(null); // photo preview
+  const [photo, setPhoto] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [errors, setErrors] = useState({});
 
-  // Fetch existing student if editing
   useEffect(() => {
     if (id) {
       getStudentById(id).then((res) => {
@@ -40,35 +42,40 @@ const StudentForm = () => {
           dob: data.dob ? data.dob.split("T")[0] : "",
           year: data.year || "",
           address: data.address || "",
+          interestedSubjects: data.interestedSubjects || [],
         });
         if (data.photo) setPreview(`/uploads/students/${data.photo}`);
       });
     }
   }, [id]);
 
-  // Handle form input changes
   const handleChange = (e) => {
     setStudent({ ...student, [e.target.name]: e.target.value });
   };
 
-  // Handle photo change
+  const handleSubjectsChange = (e) => {
+    const value = e.target.value;
+    if (student.interestedSubjects.includes(value)) {
+      setStudent({
+        ...student,
+        interestedSubjects: student.interestedSubjects.filter((s) => s !== value),
+      });
+    } else {
+      setStudent({
+        ...student,
+        interestedSubjects: [...student.interestedSubjects, value],
+      });
+    }
+  };
+
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setPhoto(file);
       setPreview(URL.createObjectURL(file));
     }
-    <img
-  src={student.photo ? `http://localhost:5000/uploads/students/${student.photo}` : '/default.jpg'}
-  alt={student.name}
-  width="50"
-  height="50"
-/>
   };
-  
 
-
-  // Validate fields
   const validate = () => {
     const errs = {};
     if (!student.firstName.trim()) errs.firstName = "First name required";
@@ -78,12 +85,10 @@ const StudentForm = () => {
     if (!student.gender.trim()) errs.gender = "Gender required";
     if (!student.course.trim()) errs.course = "Course required";
 
-    // Optional: email format
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (student.email && !emailPattern.test(student.email))
       errs.email = "Invalid email";
 
-    // Optional: mobile format
     const mobilePattern = /^[0-9]{10}$/;
     if (student.mobile && !mobilePattern.test(student.mobile))
       errs.mobile = "Mobile must be 10 digits";
@@ -92,13 +97,18 @@ const StudentForm = () => {
     return Object.keys(errs).length === 0;
   };
 
-  // Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     const formData = new FormData();
-    Object.keys(student).forEach((key) => formData.append(key, student[key]));
+    Object.keys(student).forEach((key) => {
+      if (key === "interestedSubjects") {
+        formData.append(key, JSON.stringify(student[key]));
+      } else {
+        formData.append(key, student[key]);
+      }
+    });
     if (photo) formData.append("photo", photo);
 
     try {
@@ -117,129 +127,180 @@ const StudentForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-bold mb-4">{id ? "Edit" : "Add"} Student</h2>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        {/* First Name */}
-        <div className="mb-2">
-          <label className="block">First Name*</label>
-          <input
-            type="text"
-            name="firstName"
-            value={student.firstName}
-            onChange={handleChange}
-            className="border p-1 w-full"
-          />
-          {errors.firstName && (
-            <p className="text-red-500 text-sm">{errors.firstName}</p>
-          )}
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-indigo-50">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+          {id ? "Edit Student" : "Student Registration"}
+        </h2>
+        <p className="text-gray-500 text-sm text-center mb-6">
+          Fill in the details below
+        </p>
 
-        {/* Last Name */}
-        <div className="mb-2">
-          <label className="block">Last Name*</label>
-          <input
-            type="text"
-            name="lastName"
-            value={student.lastName}
-            onChange={handleChange}
-            className="border p-1 w-full"
-          />
-          {errors.lastName && (
-            <p className="text-red-500 text-sm">{errors.lastName}</p>
-          )}
-        </div>
-
-        {/* Email */}
-        <div className="mb-2">
-          <label className="block">Email*</label>
-          <input
-            type="email"
-            name="email"
-            value={student.email}
-            onChange={handleChange}
-            className="border p-1 w-full"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email}</p>
-          )}
-        </div>
-
-        {/* Mobile */}
-        <div className="mb-2">
-          <label className="block">Mobile*</label>
-          <input
-            type="text"
-            name="mobile"
-            value={student.mobile}
-            onChange={handleChange}
-            className="border p-1 w-full"
-          />
-          {errors.mobile && (
-            <p className="text-red-500 text-sm">{errors.mobile}</p>
-          )}
-        </div>
-
-        {/* Gender */}
-        <div className="mb-2">
-          <label className="block">Gender*</label>
-          <select
-            name="gender"
-            value={student.gender}
-            onChange={handleChange}
-            className="border p-1 w-full"
-          >
-            <option value="">Select</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          {errors.gender && (
-            <p className="text-red-500 text-sm">{errors.gender}</p>
-          )}
-        </div>
-
-        {/* Course */}
-        <div className="mb-2">
-          <label className="block">Course*</label>
-          <select
-            name="course"
-            value={student.course}
-            onChange={handleChange}
-            className="border p-1 w-full"
-          >
-            <option value="">Select</option>
-            <option value="CSE">CSE</option>
-            <option value="ECE">ECE</option>
-            <option value="IT">IT</option>
-            <option value="BCA">BCA</option>
-          </select>
-          {errors.course && (
-            <p className="text-red-500 text-sm">{errors.course}</p>
-          )}
-        </div>
-
-        {/* Photo */}
-        <div className="mb-2">
-          <label className="block">Photo (Optional)</label>
-          <input type="file" accept="image/*" onChange={handlePhotoChange} />
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              className="mt-2 w-24 h-24 object-cover border"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Names */}
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              value={student.firstName}
+              onChange={handleChange}
+              className="input-box"
             />
-          )}
-        </div>
+                {errors.firstName && (
+                <p className="text-red-500 text-sm mt-1">
+                {errors.firstName}
+                </p>
+               )}
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 mt-3 rounded"
-        >
-          {id ? "Update" : "Add"} Student
-        </button>
-      </form>
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              value={student.lastName}
+              onChange={handleChange}
+              className="input-box"
+            />
+          </div>
+
+          {/* Email / Mobile */}
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={student.email}
+              onChange={handleChange}
+              className="input-box"
+            />
+            <input
+              type="text"
+              name="mobile"
+              placeholder="Mobile"
+              value={student.mobile}
+              onChange={handleChange}
+              className="input-box"
+            />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+            {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile}</p>}
+          </div>
+
+          {/* Gender radio buttons */}
+          <div>
+            <p className="font-medium text-gray-700 mb-2">Gender</p>
+            <div className="flex gap-4">
+              {["Male", "Female", "Other"].map((g) => (
+                <label
+                  key={g}
+                  className={`radio-card ${
+                    student.gender === g ? "radio-active" : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="gender"
+                    value={g}
+                    checked={student.gender === g}
+                    onChange={handleChange}
+                    className="hidden"
+                  />
+                  {g}
+                </label>
+              ))}
+            </div>
+            {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
+          </div>
+
+          {/* Course */}
+          <div>
+            <select
+              name="course"
+              value={student.course}
+              onChange={handleChange}
+              className="input-box"
+            >
+              <option value="">Select Course</option>
+              <option>CSE</option>
+              <option>ECE</option>
+              <option>IT</option>
+              <option>BCA</option>
+              <option>BCOM</option>
+              <option>BA</option>
+              <option>EEE</option>
+              <option>MECH</option>
+              <option>CIVIL</option>
+              <option>AI</option>
+            </select>
+          </div>
+
+          {/* Subjects */}
+          <div>
+            <p className="font-medium text-gray-700 mb-2">Interested Subjects</p>
+            <div className="flex flex-wrap gap-2">
+              {subjectsList.map((sub) => (
+                <label
+                  key={sub}
+                  className={`subject-chip ${
+                    student.interestedSubjects.includes(sub)
+                      ? "subject-active"
+                      : ""
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    value={sub}
+                    checked={student.interestedSubjects.includes(sub)}
+                    onChange={handleSubjectsChange}
+                    className="hidden"
+                  />
+                  {sub}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Photo upload */}
+          <div>
+            <p className="font-medium text-gray-700 mb-2">Profile Photo</p>
+            <div className="flex items-center gap-6">
+              <div className="w-28 h-28 border-2 border-dashed rounded-lg flex items-center justify-center bg-gray-50">
+                {preview ? (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <span className="text-gray-400 text-sm">No Image</span>
+                )}
+              </div>
+              <label className="cursor-pointer">
+                <span className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                  Upload Image
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          </div>
+
+          
+
+          {/* Submit */}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="px-10 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold shadow hover:scale-105 transition"
+            >
+              {id ? "Update Student" : "Submit Registration"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

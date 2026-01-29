@@ -2,9 +2,6 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // 🔐 Attach token to every request
@@ -19,13 +16,13 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 🚪 Global 401 handling (optional but best practice)
+// 🚪 Global 401 handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login"; // force redirect
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
