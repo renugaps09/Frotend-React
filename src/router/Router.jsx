@@ -12,6 +12,10 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import StudentList from "../components/StudentList";
 import StudentForm from "../components/StudentForm";
 
+// ✅ BOOK IMPORTS (ONLY ONCE)
+import BookPage from "../pages/BookPage";
+import BookForm from "../components/BookForm";
+
 function Router() {
   const [isAuth, setIsAuth] = useState(
     Boolean(localStorage.getItem("token"))
@@ -23,18 +27,18 @@ function Router() {
       {isAuth && <Navbar setIsAuth={setIsAuth} />}
 
       <Routes>
-        {/* Home page */}
+        {/* ================= HOME ================= */}
         <Route
           path="/"
           element={isAuth ? <Home /> : <Navigate to="/login" replace />}
         />
 
-        {/* Public routes */}
+        {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
         <Route path="/signup" element={<Signup setIsAuth={setIsAuth} />} />
         <Route path="/password" element={<PasswordInput />} />
 
-        {/* Protected routes */}
+        {/* ================= PRODUCTS ================= */}
         <Route
           path="/products"
           element={
@@ -43,6 +47,8 @@ function Router() {
             </ProtectedRoute>
           }
         />
+
+        {/* ================= DELIVERY ================= */}
         <Route
           path="/delivery"
           element={
@@ -52,7 +58,7 @@ function Router() {
           }
         />
 
-        {/* Students routes */}
+        {/* ================= STUDENTS ================= */}
         <Route
           path="/students"
           element={
@@ -61,6 +67,7 @@ function Router() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/students/add"
           element={
@@ -69,11 +76,40 @@ function Router() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/students/edit/:id"
           element={
             <ProtectedRoute isAuth={isAuth}>
               <StudentForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================= BOOKS (NEW CRUD) ================= */}
+        <Route
+          path="/books"
+          element={
+            <ProtectedRoute isAuth={isAuth}>
+              <BookPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/books/add"
+          element={
+            <ProtectedRoute isAuth={isAuth}>
+              <BookForm />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/books/edit/:id"
+          element={
+            <ProtectedRoute isAuth={isAuth}>
+              <BookForm />
             </ProtectedRoute>
           }
         />

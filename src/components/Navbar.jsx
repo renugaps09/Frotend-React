@@ -25,6 +25,8 @@ function Navbar({ setIsAuth }) {
         <Link to="/products">Products</Link>
         <Link to="/delivery">Delivery</Link>
         <Link to="/students">Students</Link>
+        <Link to="/books">Books</Link>
+
       </div>
 
       {/* Right side: Logout */}

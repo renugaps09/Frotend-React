@@ -191,7 +191,7 @@ const StudentForm = () => {
             <div className="flex gap-4">
               {["Male", "Female", "Other"].map((g) => (
                 <label
-                  key={g}
+                  key={g} 
                   className={`radio-card ${
                     student.gender === g ? "radio-active" : ""
                   }`}
