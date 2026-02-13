@@ -3,14 +3,23 @@ import BookForm from "../components/BookForm";
 import BookList from "../components/BookList";
 
 const BookPage = () => {
-  // State to trigger refresh of BookList after adding a book
   const [refresh, setRefresh] = useState(false);
+  const [editingBook, setEditingBook] = useState(null);
+
+  const handleEdit = (book) => {
+    setEditingBook(book);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSuccess = () => {
+    setEditingBook(null);
+    setRefresh(!refresh);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200 py-10 px-4">
       <div className="max-w-7xl mx-auto">
 
-        {/* Header */}
         <div className="mb-10">
           <h1 className="text-5xl font-bold text-slate-800 tracking-tight">
             📚 Book Management
@@ -23,10 +32,13 @@ const BookPage = () => {
         {/* Form Section */}
         <div className="bg-white/80 backdrop-blur-md shadow-xl rounded-3xl p-8 mb-10 border border-slate-200">
           <h2 className="text-2xl font-semibold text-slate-700 mb-6">
-            Add New Book
+            {editingBook ? "Edit Book" : "Add New Book"}
           </h2>
-          {/* Pass a callback to refresh the list after adding */}
-          <BookForm onBookAdded={() => setRefresh(!refresh)} />
+
+          <BookForm
+            editingBook={editingBook}
+            onSuccess={handleSuccess}
+          />
         </div>
 
         {/* List Section */}
@@ -34,8 +46,11 @@ const BookPage = () => {
           <h2 className="text-2xl font-semibold text-slate-700 mb-6">
             All Books
           </h2>
-          {/* Use key to force re-render on refresh */}
-          <BookList key={refresh} />
+
+          <BookList
+            key={refresh}
+            onEdit={handleEdit}
+          />
         </div>
 
       </div>

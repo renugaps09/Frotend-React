@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axiosInstance";
 
-const BookList = () => {
+const BookList = ({ onEdit }) => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all books from backend
   const fetchBooks = async () => {
     try {
       const res = await api.get("/books");
@@ -22,14 +21,13 @@ const BookList = () => {
     fetchBooks();
   }, []);
 
-  // Delete a book
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this book?")) return;
 
     try {
       await api.delete(`/books/${id}`);
       alert("Book deleted ✅");
-      fetchBooks(); // Refresh the list
+      fetchBooks();
     } catch (err) {
       console.log(err);
       alert("Failed to delete ❌");
@@ -74,7 +72,15 @@ const BookList = () => {
 
             {/* Buttons */}
             <div className="flex gap-3">
-              {/* Edit functionality can be added later */}
+              {/* EDIT BUTTON */}
+              <button
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-xl transition"
+                onClick={() => onEdit(book)}
+              >
+                Edit
+              </button>
+
+              {/* DELETE BUTTON */}
               <button
                 className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl transition"
                 onClick={() => handleDelete(book._id)}

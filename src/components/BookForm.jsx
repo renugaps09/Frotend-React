@@ -1,33 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../api/axiosInstance";
 
-function BookForm({ onBookAdded }) {
+function BookForm({ editingBook, onSuccess }) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [year, setYear] = useState("");
 
+  useEffect(() => {
+    if (editingBook) {
+      setTitle(editingBook.title);
+      setAuthor(editingBook.author);
+      setPrice(editingBook.price);
+      setCategory(editingBook.category);
+      setYear(editingBook.year);
+    }
+  }, [editingBook]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await api.post("/books", {
-        title,
-        author,
-        price: Number(price),
-        category,
-        year: Number(year),
-      });
+      if (editingBook) {
+        await api.put(`/books/${editingBook._id}`, {
+          title,
+          author,
+          price: Number(price),
+          category,
+          year: Number(year),
+        });
+        alert("Book Updated ✅");
+      } else {
+        await api.post("/books", {
+          title,
+          author,
+          price: Number(price),
+          category,
+          year: Number(year),
+        });
+        alert("Book Added ✅");
+      }
 
-      alert("Book Added ✅");
-
+      // Reset form
       setTitle("");
       setAuthor("");
       setPrice("");
       setCategory("");
       setYear("");
 
-      if (onBookAdded) onBookAdded();
+      if (onSuccess) onSuccess();
+
     } catch (error) {
       alert("Error ❌");
       console.log(error.response?.data || error.message);
@@ -77,7 +100,7 @@ function BookForm({ onBookAdded }) {
         type="submit"
         className="bg-indigo-500 text-white p-3 rounded hover:bg-indigo-600 transition"
       >
-        Add Book
+        {editingBook ? "Update Book" : "Add Book"}
       </button>
     </form>
   );
