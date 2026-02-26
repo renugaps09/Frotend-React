@@ -6,47 +6,49 @@ import DeliveryForm from "../pages/DeliveryForm";
 import Navbar from "../components/Navbar";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
-import PasswordInput from "../components/PasswordInput";
 import ProtectedRoute from "../components/ProtectedRoute";
 import StudentList from "../components/StudentList";
 import StudentForm from "../components/StudentForm";
 
-// ✅ BOOK IMPORTS
+// BOOK IMPORTS
 import BookPage from "../pages/BookPage";
 import BookForm from "../components/BookForm";
 
-// ✅ PRODUCT LOGIN FLOW IMPORTS
+// PRODUCT FLOW IMPORTS
 import ProductLoginSelect from "../pages/ProductLoginSelect";
 import ProductAdminLogin from "../pages/ProductAdminLogin";
 import ProductUserLogin from "../pages/ProductUserLogin";
 import AdminProducts from "../pages/AdminProducts";
 import UserProducts from "../pages/UserProducts";
 
+// ✅ NEW: Email verification page
+import VerifyEmailPage from "../pages/VerifyEmailPage";
+
 function Router() {
-  const [isAuth, setIsAuth] = useState(
-    Boolean(localStorage.getItem("token"))
-  );
+  const [isAuth, setIsAuth] = useState(Boolean(localStorage.getItem("token")));
 
   return (
     <BrowserRouter>
-      {/* ✅ Navbar only when logged in */}
+
+      {/* Navbar only when logged in */}
       {isAuth && <Navbar setIsAuth={setIsAuth} />}
 
       <Routes>
+
         {/* ================= HOME ================= */}
         <Route
           path="/"
           element={isAuth ? <Home /> : <Navigate to="/login" replace />}
         />
 
-        {/* ================= PUBLIC ================= */}
+        {/* ================= PUBLIC ROUTES ================= */}
         <Route path="/login" element={<Login setIsAuth={setIsAuth} />} />
-        <Route path="/signup" element={<Signup setIsAuth={setIsAuth} />} />
-        <Route path="/password" element={<PasswordInput />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* ================= EMAIL VERIFICATION ================= */}
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* ================= PRODUCTS FLOW ================= */}
-
-        {/* Step 1 → Select Admin or User */}
         <Route
           path="/products"
           element={
@@ -55,8 +57,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
-        {/* Step 2 → Admin Login */}
         <Route
           path="/product-admin-login"
           element={
@@ -65,8 +65,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
-        {/* Step 2 → User Login */}
         <Route
           path="/product-user-login"
           element={
@@ -75,8 +73,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
-        {/* Step 3 → Admin Dashboard (CRUD Products) */}
         <Route
           path="/admin-products"
           element={
@@ -85,8 +81,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
-        {/* Step 3 → User Product Page (Add To Cart) */}
         <Route
           path="/user-products"
           element={
@@ -115,7 +109,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/students/add"
           element={
@@ -124,7 +117,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/students/edit/:id"
           element={
@@ -143,7 +135,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/books/add"
           element={
@@ -152,7 +143,6 @@ function Router() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/books/edit/:id"
           element={
@@ -161,6 +151,7 @@ function Router() {
             </ProtectedRoute>
           }
         />
+
       </Routes>
     </BrowserRouter>
   );
